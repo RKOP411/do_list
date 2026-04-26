@@ -145,4 +145,65 @@ class Tasks extends BaseController
             ]);
         }
     }
+
+    // Update a task
+    public function update($id = null){
+        // Check if AJAX request
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Invalid request method'
+            ]);
+        }
+
+        $jsonData = $this->request->getJSON();
+
+        $description = $jsonData->description ?? $this->request->getPost('description');
+        $status = $jsonData->status ?? $this->request->getPost('status');
+
+        // Validation
+        $errors = [];
+        if (empty($description) || strlen($description) < 3) {
+            $errors[] = 'Description must be at least 3 characters long.';
+        }
+
+        if (!in_array($status, ['Done', 'Not done'])) {
+            $errors[] = 'Invalid status value.';
+        }
+
+        if (!empty($errors)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => implode(' ', $errors)
+            ]);
+        }
+
+        // Check if task exists
+        $task = $this->taskModel->find($id);
+        if (!$task) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Task not found'
+            ]);
+        }
+
+        // Prepare data for update
+        $data = [
+            'description' => trim($description),
+            'status' => $status
+        ];
+
+        // Update the task
+        if ($this->taskModel->update($id, $data)) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Task updated successfully!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to update task. Please try again.'
+            ]);
+        }
+    }
 }

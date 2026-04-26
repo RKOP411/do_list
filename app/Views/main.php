@@ -318,9 +318,37 @@
         }
 
         function deleteTask(taskId) {
-            if (confirm('Are you sure you want to delete this task?')) {
-                alert('Delete task ' + taskId + ' (to be implemented)');
+            if (!confirm('Are you sure you want to delete this task?')) {
+                return;
             }
+
+            fetch('/do_list/public/tasks/delete/' + taskId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showToast(data.message || 'Error deleting task', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred. Please try again.', 'error');
+                });
         }
 
         // Show modal when Add New Task button is clicked

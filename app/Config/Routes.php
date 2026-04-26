@@ -19,4 +19,5 @@ $routes->get('/home', 'Home::index');
 
 //Action
 $routes->post('/tasks/store', 'Tasks::store');  
+$routes->post('/tasks/delete/(:num)', 'Tasks::delete/$1');
 $routes->get('/tasks', 'Tasks::index');

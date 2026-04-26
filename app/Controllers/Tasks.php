@@ -101,4 +101,48 @@ class Tasks extends BaseController
         $max = $this->taskModel->getMaxQueueNum();
         return $this->response->setJSON(['max_queue' => $max]);
     }
+
+    // Delete a task
+    public function delete($id = null)
+    {
+        // Check if AJAX request
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Invalid request method'
+            ]);
+        }
+
+        if (!$id) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Task ID is required'
+            ]);
+        }
+
+        // Check if task exists
+        $task = $this->taskModel->find($id);
+        if (!$task) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Task not found'
+            ]);
+        }
+
+        // Delete the task
+        if ($this->taskModel->delete($id)) {
+            // Reorder queue numbers after deletion
+            $this->taskModel->reorderQueueNumbers();
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Task deleted successfully!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to delete task. Please try again.'
+            ]);
+        }
+    }
 }

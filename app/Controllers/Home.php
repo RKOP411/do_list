@@ -10,6 +10,6 @@ class Home extends BaseController
             'title' => 'Do List'
         ];
         
-        return view('layouts/main', $data);
+        return view('main', $data);
     }
 }

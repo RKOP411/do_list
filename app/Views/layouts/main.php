@@ -1,87 +1,83 @@
+<?php
+
+// Add these lines for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Check if we can bootstrap
+try {
+    // Rest of your existing code...
+    require_once '../app/Config/Paths.php';
+    // ... etc
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "<br>";
+    echo "File: " . $e->getFile() . "<br>";
+    echo "Line: " . $e->getLine() . "<br>";
+    throw $e;
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Do List' ?></title>
+    <title>Do List - Task Manager</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 6 -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            font-family: 'Poppins', sans-serif;
-        }
-        
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
+        .main-card {
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
         
-        .card {
-            border-radius: 15px;
-            border: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .task-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-            border-left: 4px solid #667eea;
-        }
-        
-        .task-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .task-card.done {
-            background: #f8f9fa;
-            border-left-color: #28a745;
-            opacity: 0.8;
-        }
-        
-        .task-card.done .task-description {
-            text-decoration: line-through;
-            color: #6c757d;
-        }
-        
-        .queue-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+        .card-header {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
-            font-weight: bold;
-            margin-right: 15px;
+            padding: 25px;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+        
+        .badge-done {
+            background-color: #28a745;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .badge-pending {
+            background-color: #ffc107;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
         }
         
         .stat-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 15px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: transform 0.3s;
         }
         
         .stat-card:hover {
@@ -89,157 +85,279 @@
         }
         
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .btn-action {
-            margin: 0 3px;
-            border-radius: 20px;
-            padding: 5px 15px;
-        }
-        
-        .drag-handle {
-            cursor: move;
-            color: #6c757d;
-            margin-right: 10px;
-        }
-        
-        .drag-handle:hover {
             color: #667eea;
         }
         
-        .alert-floating {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
-            animation: slideIn 0.5s ease;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        .btn-gradient {
+        .welcome-banner {
             background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            padding: 30px;
             color: white;
-            border: none;
-        }
-        
-        .btn-gradient:hover {
-            background: linear-gradient(135deg, #764ba2, #667eea);
-            color: white;
-            transform: translateY(-2px);
-        }
-        
-        .search-box {
-            border-radius: 25px;
-            padding: 10px 20px;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .filter-btn {
-            border-radius: 25px;
-            padding: 8px 20px;
-            margin: 0 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .filter-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        
-        @media (max-width: 768px) {
-            .stat-number {
-                font-size: 1.5rem;
-            }
-            
-            .btn-action {
-                padding: 3px 10px;
-                font-size: 12px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="<?= base_url('/tasks') ?>">
-                <i class="fas fa-tasks"></i> Do List
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link <?= current_url() == base_url('/tasks') ? 'active' : '' ?>" href="<?= base_url('/tasks') ?>">
-                            <i class="fas fa-list"></i> All Tasks
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?= current_url() == base_url('/tasks/create') ? 'active' : '' ?>" href="<?= base_url('/tasks/create') ?>">
-                            <i class="fas fa-plus"></i> Add Task
-                        </a>
-                    </li>
-                </ul>
+    <div class="container py-5">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner mb-4 text-center">
+            <h1 class="display-4 fw-bold">
+                <i class="fas fa-tasks me-3"></i>Do List
+            </h1>
+            <p class="lead mb-0">Organize your tasks, boost productivity, achieve more!</p>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="stat-card shadow-sm">
+                    <i class="fas fa-clipboard-list fa-2x text-primary mb-2"></i>
+                    <div class="stat-number">12</div>
+                    <div class="text-muted">Total Tasks</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stat-card shadow-sm">
+                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                    <div class="stat-number text-success">7</div>
+                    <div class="text-muted">Completed</div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="stat-card shadow-sm">
+                    <i class="fas fa-hourglass-half fa-2x text-warning mb-2"></i>
+                    <div class="stat-number text-warning">5</div>
+                    <div class="text-muted">Pending</div>
+                </div>
             </div>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mt-4">
-        <?= view('partials/messages') ?>
-        <?= $this->renderSection('content') ?>
-    </main>
-
-    <!-- Footer -->
-    <footer class="text-center text-white mt-5 py-3">
-        <div class="container">
-            <small>&copy; <?= date('Y') ?> Do List - Task Manager. All rights reserved.</small>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    
-    <script>
-        // Auto-hide alerts after 5 seconds
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.alert-floating').fadeOut('slow');
-            }, 5000);
-        });
         
-        // Function to show temporary message
-        function showMessage(message, type = 'success') {
-            const alert = $(`
-                <div class="alert alert-${type} alert-floating alert-dismissible fade show" role="alert">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> 
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <!-- Tasks Table Card -->
+        <div class="card main-card shadow-lg">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-list-check me-2"></i>My Tasks
+                </h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px">#</th>
+                                <th style="width: 50px"></th>
+                                <th>Description</th>
+                                <th style="width: 120px">Date</th>
+                                <th style="width: 120px">Status</th>
+                                <th style="width: 100px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Task 1 -->
+                            <tr>
+                                <td class="fw-bold">1</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Complete project documentation</td>
+                                <td>2024-05-15</td>
+                                <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 2 -->
+                            <tr>
+                                <td class="fw-bold">2</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Review pull requests</td>
+                                <td>2024-05-16</td>
+                                <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 3 -->
+                            <tr>
+                                <td class="fw-bold">3</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Update website content</td>
+                                <td>2024-05-14</td>
+                                <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 4 -->
+                            <tr>
+                                <td class="fw-bold">4</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Fix bugs in login system</td>
+                                <td>2024-05-17</td>
+                                <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 5 -->
+                            <tr>
+                                <td class="fw-bold">5</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Prepare monthly report</td>
+                                <td>2024-05-18</td>
+                                <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 6 -->
+                            <tr>
+                                <td class="fw-bold">6</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Team meeting preparation</td>
+                                <td>2024-05-19</td>
+                                <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 7 -->
+                            <tr>
+                                <td class="fw-bold">7</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Client feedback collection</td>
+                                <td>2024-05-13</td>
+                                <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Task 8 -->
+                            <tr>
+                                <td class="fw-bold">8</td>
+                                <td><i class="fas fa-tasks text-muted"></i></td>
+                                <td>Deploy application to server</td>
+                                <td>2024-05-20</td>
+                                <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-            `);
-            $('body').append(alert);
-            setTimeout(() => alert.fadeOut('slow'), 3000);
-        }
-    </script>
+            </div>
+            <div class="card-footer bg-light text-center">
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> 
+                    This is a demo UI with sample data. Buttons are disabled for preview.
+                </small>
+            </div>
+        </div>
+        
+        <!-- Feature Highlights -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5>Easy to Use</h5>
+                        <p class="text-muted">Simple interface for managing your daily tasks</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-sync-alt fa-3x text-primary mb-3"></i>
+                        <h5>One-Click Updates</h5>
+                        <p class="text-muted">Toggle task status with a single click</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm text-center h-100">
+                    <div class="card-body">
+                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                        <h5>Track Progress</h5>
+                        <p class="text-muted">Monitor your productivity and achievements</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

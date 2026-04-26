@@ -14,10 +14,7 @@ class TaskModel extends Model
     protected $protectFields = true;
     protected $allowedFields = ['queue_num', 'description', 'date', 'status'];
     
-    protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
+    protected $useTimestamps = false;
     
     // Get all tasks ordered by queue number
     public function getAllTasks()
@@ -37,5 +34,26 @@ class TaskModel extends Model
             'completed' => $completed,
             'pending' => $pending
         ];
+    }
+    
+    // NEW: Get maximum queue number
+    public function getMaxQueueNum()
+    {
+        $result = $this->selectMax('queue_num')->first();
+        return $result['queue_num'] ?? 0;
+    }
+    
+    // NEW: Reorder queue numbers after deletion
+    public function reorderQueueNumbers()
+    {
+        $tasks = $this->orderBy('queue_num', 'ASC')->findAll();
+        $counter = 1;
+        
+        foreach ($tasks as $task) {
+            if ($task['queue_num'] != $counter) {
+                $this->update($task['id'], ['queue_num' => $counter]);
+            }
+            $counter++;
+        }
     }
 }

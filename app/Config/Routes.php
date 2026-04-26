@@ -4,14 +4,19 @@ use CodeIgniter\Router\RouteCollection;
 
 /**
  * @var RouteCollection $routes
- * 
  */
 
 $routes->setDefaultNamespace('App\Controllers');
-$routes->setDefaultController('Home');
+$routes->setDefaultController('Tasks');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
-$routes->setAutoRoute(false);
+$routes->setAutoRoute(false);  // Change to false for better control
 
-$routes->get('/', 'Home::index');
+// Main routes
+$routes->get('/', 'Tasks::index');
+$routes->get('/home', 'Home::index');
+
+//Action
+$routes->post('/tasks/store', 'Tasks::store');  
+$routes->get('/tasks', 'Tasks::index');

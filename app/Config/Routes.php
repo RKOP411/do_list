@@ -21,4 +21,6 @@ $routes->get('/home', 'Home::index');
 $routes->post('/tasks/store', 'Tasks::store');  
 $routes->post('/tasks/delete/(:num)', 'Tasks::delete/$1');
 $routes->post('/tasks/update/(:num)', 'Tasks::update/$1');
+$routes->post('/tasks/toggle_status/(:num)', 'Tasks::toggleStatus/$1');
 $routes->get('/tasks', 'Tasks::index');
+$routes->get('/tasks/get_tasks', 'Tasks::getTasks');

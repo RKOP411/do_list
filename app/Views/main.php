@@ -196,7 +196,7 @@
                                         </td>
                                         <td class="action-buttons">
                                             <button class="btn btn-sm btn-outline-success"
-                                                onclick="toggleStatus(<?= $task['id'] ?>)"
+                                                onclick="toggleStatus(<?= $task['id'] ?>, '<?= $task['status'] ?>')"
                                                 title="Toggle Status">
                                                 <i class="fas fa-check"></i>
                                             </button>
@@ -352,12 +352,75 @@
     <script>
         let currentTaskId = null;
 
+        // Fast page reload without full refresh
         function reloadPage() {
-            location.reload();
+            fetchTasks();
         }
-        // Placeholder functions for future implementation
-        function toggleStatus(taskId) {
-            alert('Toggle status for task ' + taskId + ' (to be implemented)');
+
+        // Fetch and render tasks dynamically
+        function fetchTasks() {
+            fetch('/do_list/public/tasks/get_tasks', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update table body
+                        const tableBody = document.querySelector('tbody');
+                        if (tableBody && data.html) {
+                            tableBody.innerHTML = data.html;
+                        }
+                        
+                        // Update stats
+                        const statNumbers = document.querySelectorAll('.stat-number');
+                        if (statNumbers.length >= 3) {
+                            statNumbers[0].textContent = data.totalTasks;
+                            statNumbers[1].textContent = data.completedTasks;
+                            statNumbers[2].textContent = data.pendingTasks;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error refreshing tasks:', error);
+                    location.reload();
+                });
+        }
+        // Toggle Task Status (Only change to Done)
+        function toggleStatus(taskId, currentStatus) {
+            if (currentStatus === 'Done') {
+                showToast('Task is already marked as Done!', 'error');
+                return;
+            }
+            fetch('/do_list/public/tasks/toggle_status/' + taskId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP error ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => {
+                            reloadPage();
+                        }, 1000);
+                    } else {
+                        showToast(data.message || 'Error toggling status', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred. Please try again.', 'error');
+                });
         }
 
 
@@ -434,7 +497,7 @@
 
                         // Reload page to show updated task
                         setTimeout(() => {
-                            location.reload();
+                            reloadPage();
                         }, 1000);
                     } else {
                         showToast(data.message || 'Error updating task', 'error');

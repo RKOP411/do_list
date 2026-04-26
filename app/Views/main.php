@@ -201,7 +201,7 @@
                                                 <i class="fas fa-check"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-primary"
-                                                onclick="editTask(<?= $task['id'] ?>)"
+                                                onclick="editTask(<?= $task['id'] ?>, '<?= esc(addslashes($task['description'])) ?>', '<?= $task['status'] ?>')"
                                                 title="Edit Task">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -293,6 +293,48 @@
     <!-- Add Task Modal -->
 
 
+    <!-- Edit Task Modal-->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editTaskModalLabel">
+                        <i class="fas fa-edit"></i> Edit Task
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm">
+                        <input type="hidden" id="edit_task_id" name="task_id">
+
+                        <div class="mb-3">
+                            <label for="edit_description" class="form-label">Description *</label>
+                            <textarea class="form-control" id="edit_description" name="description"
+                                rows="3" placeholder="Enter task description..." required> </textarea>
+                            <div class="invalid-feedback">Please enter a task description.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_status" class="form-label">Status</label>
+                            <select class="form-select" id="edit_status" name="status">
+                                <option value="Not done">⏳ Not done</option>
+                                <option value="Done">✅ Done</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitEditTask()">
+                        <i class="fas fa-save"></i> Update Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Task Modal-->
+
+
     <!-- Success/Error Toast Messages -->
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="toastMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
@@ -308,6 +350,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        let currentTaskId = null;
+
         function reloadPage() {
             location.reload();
         }
@@ -316,9 +360,96 @@
             alert('Toggle status for task ' + taskId + ' (to be implemented)');
         }
 
-        function editTask(taskId) {
-            alert('Edit task ' + taskId + ' (to be implemented)');
+
+        // Function to open edit modal
+        function editTask(taskId, description, status) {
+            // Store task ID
+            currentTaskId = taskId;
+
+            // Set values in form
+            document.getElementById('edit_task_id').value = taskId;
+            document.getElementById('edit_description').value = description;
+            document.getElementById('edit_status').value = status;
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+            modal.show();
         }
+
+        // Function to submit edit task
+        function submitEditTask() {
+            const taskId = document.getElementById('edit_task_id').value;
+            const description = document.getElementById('edit_description').value.trim();
+            const status = document.getElementById('edit_status').value;
+
+            // Validate description
+            if (!description) {
+                showToast('Please enter a task description!', 'error');
+                document.getElementById('edit_description').classList.add('is-invalid');
+                return;
+            }
+
+            if (description.length < 3) {
+                showToast('Description must be at least 3 characters long!', 'error');
+                return;
+            }
+
+            // Disable submit button
+            const submitBtn = event.target;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            // Get CSRF token
+            const csrfToken = document.querySelector('input[name="csrf_test_name"]')?.value || '';
+
+            // Send update request
+            fetch('/do_list/public/index.php/tasks/update/' + taskId, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        description: description,
+                        status: status,
+                        csrf_test_name: csrfToken
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(text.substring(0, 200));
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editTaskModal'));
+                        modal.hide();
+
+                        // Show success message
+                        showToast(data.message, 'success');
+
+                        // Reload page to show updated task
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showToast(data.message || 'Error updating task', 'error');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Task';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred: ' + error.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Task';
+                });
+        }
+
 
         function deleteTask(taskId) {
             if (!confirm('Are you sure you want to delete this task?')) {

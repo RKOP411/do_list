@@ -33,18 +33,19 @@ try {
     
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .main-card {
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
             overflow: hidden;
+            border: 1px solid #e0e0e0;
         }
         
         .card-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #000000;
             color: white;
             padding: 25px;
         }
@@ -63,38 +64,79 @@ try {
             background-color: #28a745;
             padding: 5px 12px;
             border-radius: 20px;
+            white-space: nowrap;
+            display: inline-block;
         }
         
         .badge-pending {
-            background-color: #ffc107;
-            color: #333;
+            background-color: #6c757d;
+            color: white;
             padding: 5px 12px;
             border-radius: 20px;
+            white-space: nowrap;
+            display: inline-block;
         }
         
         .stat-card {
-            background: white;
+            background: #f8f9fa;
             border-radius: 15px;
             padding: 15px;
             text-align: center;
             transition: transform 0.3s;
+            border: 1px solid #e0e0e0;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
         
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: #000000;
         }
         
         .welcome-banner {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #000000;
             border-radius: 15px;
             padding: 30px;
             color: white;
+        }
+        
+        .btn-outline-success {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Ensure status badges don't wrap */
+        .table td:nth-child(5) {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -105,14 +147,13 @@ try {
             <h1 class="display-4 fw-bold">
                 <i class="fas fa-tasks me-3"></i>Do List
             </h1>
-            <p class="lead mb-0">Organize your tasks, boost productivity, achieve more!</p>
         </div>
         
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-md-4 mb-3">
                 <div class="stat-card shadow-sm">
-                    <i class="fas fa-clipboard-list fa-2x text-primary mb-2"></i>
+                    <i class="fas fa-clipboard-list fa-2x text-secondary mb-2"></i>
                     <div class="stat-number">12</div>
                     <div class="text-muted">Total Tasks</div>
                 </div>
@@ -126,8 +167,8 @@ try {
             </div>
             <div class="col-md-4 mb-3">
                 <div class="stat-card shadow-sm">
-                    <i class="fas fa-hourglass-half fa-2x text-warning mb-2"></i>
-                    <div class="stat-number text-warning">5</div>
+                    <i class="fas fa-hourglass-half fa-2x text-secondary mb-2"></i>
+                    <div class="stat-number text-secondary">5</div>
                     <div class="text-muted">Pending</div>
                 </div>
             </div>
@@ -149,8 +190,8 @@ try {
                                 <th style="width: 50px"></th>
                                 <th>Description</th>
                                 <th style="width: 120px">Date</th>
-                                <th style="width: 120px">Status</th>
-                                <th style="width: 100px">Actions</th>
+                                <th style="width: 130px">Status</th>
+                                <th style="width: 130px">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -162,13 +203,13 @@ try {
                                 <td>2024-05-15</td>
                                 <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -182,13 +223,13 @@ try {
                                 <td>2024-05-16</td>
                                 <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -202,13 +243,13 @@ try {
                                 <td>2024-05-14</td>
                                 <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -222,13 +263,13 @@ try {
                                 <td>2024-05-17</td>
                                 <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -242,13 +283,13 @@ try {
                                 <td>2024-05-18</td>
                                 <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -262,13 +303,13 @@ try {
                                 <td>2024-05-19</td>
                                 <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -282,13 +323,13 @@ try {
                                 <td>2024-05-13</td>
                                 <td><span class="badge-done"><i class="fas fa-check-circle"></i> Done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -302,13 +343,13 @@ try {
                                 <td>2024-05-20</td>
                                 <td><span class="badge-pending"><i class="fas fa-hourglass-half"></i> Not done</span></td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-success me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-success me-1">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-primary me-1" disabled>
+                                    <button class="btn btn-sm btn-outline-primary me-1">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-danger" disabled>
+                                    <button class="btn btn-sm btn-outline-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -320,41 +361,11 @@ try {
             <div class="card-footer bg-light text-center">
                 <small class="text-muted">
                     <i class="fas fa-info-circle"></i> 
-                    This is a demo UI with sample data. Buttons are disabled for preview.
+                    Copyright © 2026 LKT. All rights reserved.
                 </small>
             </div>
         </div>
         
-        <!-- Feature Highlights -->
-        <div class="row mt-4">
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                        <h5>Easy to Use</h5>
-                        <p class="text-muted">Simple interface for managing your daily tasks</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fas fa-sync-alt fa-3x text-primary mb-3"></i>
-                        <h5>One-Click Updates</h5>
-                        <p class="text-muted">Toggle task status with a single click</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="card shadow-sm text-center h-100">
-                    <div class="card-body">
-                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
-                        <h5>Track Progress</h5>
-                        <p class="text-muted">Monitor your productivity and achievements</p>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
     
     <!-- Bootstrap JS Bundle -->

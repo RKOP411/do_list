@@ -265,7 +265,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="addTaskForm">
-                       
+
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Description *</label>
@@ -308,6 +308,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        function reloadPage() {
+            location.reload();
+        }
         // Placeholder functions for future implementation
         function toggleStatus(taskId) {
             alert('Toggle status for task ' + taskId + ' (to be implemented)');
@@ -339,7 +342,7 @@
                     if (data.success) {
                         showToast(data.message, 'success');
                         setTimeout(() => {
-                            location.reload();
+                            reloadPage();
                         }, 1000);
                     } else {
                         showToast(data.message || 'Error deleting task', 'error');
@@ -349,6 +352,8 @@
                     console.error('Error:', error);
                     showToast('An error occurred. Please try again.', 'error');
                 });
+
+
         }
 
         // Show modal when Add New Task button is clicked
@@ -414,7 +419,7 @@
 
                         // Reload page to show new task
                         setTimeout(() => {
-                            location.reload();
+                            reloadPage();
                         }, 1000);
                     } else {
                         showToast(data.message || 'Error adding task', 'error');
